@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 services:
   php:
     build:
@@ -19,7 +19,9 @@ services:
     networks:
       - app-network
   webserver:
-    image: nginx:latest
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
     container_name: webserver
     restart: unless-stopped
     tty: true
@@ -28,33 +30,30 @@ services:
       - "443:443"
     volumes:
       - ./:/var/www
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./storage/app/public/:/var/www/public/storage/
     depends_on:
       - php
+      - db
     networks:
       - app-network
   db:
-    image: mysql:8.0
-    platform: linux/x86_64
+    image: postgres:latest
     container_name: db
     restart: unless-stopped
     tty: true
     ports:
-      - "3306:3306"
+      - "54321:5432"
     environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: root
-      SERVICE_NAME: mysql
-      SERVICE_TAGS: dev
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_DB=${DB_DATABASE}
     volumes:
-      - dbdata:/var/lib/mysql
+      - ./data/db/pgsql:/var/lib/postgresql/data
     networks:
       - app-network
 networks:
   app-network:
     driver: bridge
-volumes:
-  dbdata:
-    driver: local
+
 
 
