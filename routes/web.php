@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Blog\PostController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,16 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/rest', function () {
+    return view('welcome');
+});
+
+Route::prefix('blog')->group(function () {
+    Route::resource('/posts', PostController::class)->names('posts');
 });
